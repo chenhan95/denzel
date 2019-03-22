@@ -14,25 +14,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 
 var server = app.listen(9290, async function () {
+    const movies = await imdb(DENZEL_IMDB_ID);
     var port = server.address().port
     console.log("应用实例，访问地址为 http://%s", port)
 })
 
-app.get('/movies/populate', async function (req, res) {
-    const movies = await imdb(DENZEL_IMDB_ID);
+app.get('/movies/populate', function (req, res) {
     res.send(`Total ${movies.length}`);
 })
 
-app.get('/movies', async function (req, res) {  //must-watch movie
-    const movies = await imdb(DENZEL_IMDB_ID);
+app.get('/movies', function (req, res) {  //must-watch movie
     const awesome = movies.filter(movie => movie.metascore >= 70);
     res.send(JSON.stringify(awesome, null, 2));
 })
 
-app.get('/movies/search', async function (req, res) {  //must-watch movie
+app.get('/movies/search', function (req, res) {  //must-watch movie
     const limit=req.query.limit;
     const score=req.query.metascore;
-    const movies = await imdb(DENZEL_IMDB_ID);
     var response={};
     const current = movies.filter(movie => movie.metascore >= score);
 
@@ -55,7 +53,6 @@ app.get('/movies/search', async function (req, res) {  //must-watch movie
 })
 
 app.get('/movies/:id', async function (req, res) {  //must-watch movie
-    const movies = await imdb(DENZEL_IMDB_ID);
     var params = req.params;
     const current = movies.filter(movie => movie.id == params.id);
     res.send(JSON.stringify(current, null, 2));

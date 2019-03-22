@@ -9,34 +9,50 @@ var app = express();
 
 // root 提供所有 API 入口端点相应的解析器函数
 var root = {
-    /*movie:({movieId})=>{
-        for(var i=0;i<movie.length;i++){
-            if(movie[i].id==movieId)
-                return new
+    movies:()=>{
+        var response=[];
+        for(let i=0;i<movies.length;i++){
+            response.push(new Movie(movies[i]));
         }
+        return response;
+    },
 
-    },*/
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            movies:()=>{
-        var result=[];
-        for(var i=0;i<movie.length;i++){
-            if(movies[i].id==movieId)
-                result.push(movies[i]);
-        }
-        return result;
+    movie: ({movieId}) => {
+        const current = movies.filter(movie => movie.id == movieId);
+       // console.log(current);
+        return current;
+    },
+
+    awesome:()=>{
+        const awesome = movies.filter(movie => movie.metascore >= 70);
+        return awesome;
     },
 
     populate: () => {
         return {total: movies.length};
     },
 
-    metascore: () => {
-        return 'Hello world!';
-    },
-    synopsis: () => {
-        return 'Hello world!';
-    },
+    search: ({limit,metascore}) => {
+        const current = movies.filter(movie => movie.metascore >= metascore);
+        var response = {};
+        response.limit = limit;
+        if (current.length <= limit) {
+            response.limit = limit;
+            response.results = current;
+            response.total = current.length;
+        }
+        else {
+            var temp = [];
+            for (var i = 0; i < limit; i++) {
+                temp.push(current[i]);
+                response.limit = limit;
+                response.results = temp;
+                response.total = limit;
+            }
+        }
+        return response;
+    }
 };
-
 
 app.use('/graphql', graphqlHTTP({
     schema: schema,
